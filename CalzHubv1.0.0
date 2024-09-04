@@ -1,0 +1,257 @@
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+
+local Window = Library.CreateLib("CalzHub v1.0.0 | Arsenal", "Midnight")
+
+local Tab = Window:NewTab("Arsenal")
+
+local Section = Tab:NewSection("Combat")
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+-- Function to create and update the label
+local function updateLabel()
+    local playerName = player.Name
+    local userId = player.UserId
+    local labelText = "Name: " .. playerName .. " | User ID: " .. userId
+
+    -- Assuming 'section' is already defined and has the method 'NewLabel'
+    Section:NewLabel(labelText)
+end
+
+-- Call the function to set the label text
+updateLabel()
+
+Section:NewLabel("Supports Mobile And Pc Executors.")
+
+Section:NewButton("Hitbox", "Makes The Characters Hitbox Bigger", function()
+        -- Function to get the Players service
+        local function getPlayersService()
+            for _, v in pairs(game:GetChildren()) do
+                if v:IsA("Players") then
+                    return v
+                end
+            end
+        end
+
+        local playersService = getPlayersService()
+        local localPlayer = playersService.LocalPlayer
+
+        -- Function to adjust the size and properties of a character part
+        local function adjustPart(part)
+            if part and part:IsA("BasePart") then
+                part.CanCollide = false
+                part.Transparency = 0.5
+                part.Size = Vector3.new(13, 13, 13)
+            end
+        end
+
+        -- Main loop to continuously update all characters
+        while true do
+            for _, player in pairs(playersService:GetPlayers()) do
+                if player ~= localPlayer and player.Character then
+                    local character = player.Character
+                    -- Adjust parts
+                    adjustPart(character:FindFirstChild("RightUpperLeg"))
+                    adjustPart(character:FindFirstChild("LeftUpperLeg"))
+                    adjustPart(character:FindFirstChild("Head"))
+                    adjustPart(character:FindFirstChild("HumanoidRootPart"))
+                end
+            end
+            wait(1)  -- Wait for 1 second before running again
+        end
+    print("Clicked")
+end)
+
+Section:NewButton("Invisible Hitbox", "Makes The Hitbox Invisible", function()
+        -- Function to get the Players service
+        local function getPlayersService()
+            for _, v in pairs(game:GetChildren()) do
+                if v:IsA("Players") then
+                    return v
+                end
+            end
+        end
+
+        local playersService = getPlayersService()
+        local localPlayer = playersService.LocalPlayer
+
+        -- Function to adjust the size and properties of a character part
+        local function adjustPart(part)
+            if part and part:IsA("BasePart") then
+                part.CanCollide = false
+                part.Transparency = 0.5
+                part.Size = Vector3.new(13, 13, 13)
+            end
+        end
+
+        -- Function to make the head invisible but keep its hitbox
+        local function adjustHead(head)
+            if head and head:IsA("BasePart") then
+                head.CanCollide = true
+                head.Transparency = 1  -- Make the head fully invisible
+                head.Size = Vector3.new(13, 13, 13)
+            end
+        end
+
+        -- Main loop to continuously update all characters
+        while true do
+            for _, player in pairs(playersService:GetPlayers()) do
+                if player ~= localPlayer and player.Character then
+                    local character = player.Character
+                    -- Adjust parts
+                    adjustPart(character:FindFirstChild("RightUpperLeg"))
+                    adjustPart(character:FindFirstChild("LeftUpperLeg"))
+                    adjustHead(character:FindFirstChild("Head"))
+                    adjustPart(character:FindFirstChild("HumanoidRootPart"))
+                end
+            end
+            wait(1)  -- Wait for 1 second before running again
+        end
+    print("Clicked")
+end)
+
+
+local Tab = Window:NewTab("Visuals")
+
+local Section = Tab:NewSection("Visuals")
+
+Section:NewButton("Tracers", "Lines To All Players", function()
+        -- Simple Tracers Script
+        local Players = game:GetService("Players")
+        local RunService = game:GetService("RunService")
+        local Camera = workspace.CurrentCamera
+        local LocalPlayer = Players.LocalPlayer
+
+        local function createTracer(player)
+            local tracer = Drawing.new("Line")
+            tracer.Visible = false
+            tracer.Color = Color3.new(1, 0, 0) -- Set color to red
+            tracer.Thickness = 2
+            tracer.Transparency = 1
+            tracer.From = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y) -- Start from the bottom center of the screen
+
+            local function updateTracer()
+                local character = player.Character
+                if character and character:FindFirstChild("HumanoidRootPart") then
+                    local position, onScreen = Camera:WorldToViewportPoint(character.HumanoidRootPart.Position)
+                    if onScreen then
+                        tracer.To = Vector2.new(position.X, position.Y)
+                        tracer.Visible = true
+                    else
+                        tracer.Visible = false
+                    end
+                else
+                    tracer.Visible = false
+                end
+            end
+
+            RunService.RenderStepped:Connect(updateTracer)
+        end
+
+        -- Create tracers for existing players
+        for _, player in pairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer then
+                createTracer(player)
+            end
+        end
+
+        -- Create tracers for new players
+        Players.PlayerAdded:Connect(function(player)
+            if player ~= LocalPlayer then
+                createTracer(player)
+            end
+        end)
+    print("Clicked")
+end)
+
+local Tab = Window:NewTab("Gun")
+
+local Section = Tab:NewSection("Gun")
+
+Section:NewButton("Gun Mods", "Mods Ur Gun", function()
+        -- Place this script in ServerScriptService or a LocalScript in StarterPlayerScripts
+
+        local gun = workspace:FindFirstChild("Gun") -- Replace "Gun" with the name of your gun model
+
+        if not gun then
+            warn("Gun not found in the workspace")
+            return
+        end
+
+        local gunHandle = gun:FindFirstChild("Handle") -- Assuming the gun has a Handle part
+        local firingRate = 0.1 -- Time in seconds between each shot
+        local damage = 25 -- Damage per shot
+
+        local function fireGun()
+            while true do
+                wait(firingRate) -- Delay between shots
+                if gunHandle then
+                    -- Fire the gun (create and shoot a projectile, for example)
+                    local bullet = Instance.new("Part")
+                    bullet.Size = Vector3.new(1, 1, 5)
+                    bullet.Position = gunHandle.Position + (gunHandle.CFrame.LookVector * 2) -- Shoot in the direction the gun is pointing
+                    bullet.Anchored = false
+                    bullet.CanCollide = true
+                    bullet.BrickColor = BrickColor.new("Bright red")
+                    bullet.Parent = workspace
+
+                    -- Add a script or behavior to the bullet to deal damage when it hits a player
+                    bullet.Touched:Connect(function(hit)
+                        local character = hit.Parent
+                        local humanoid = character:FindFirstChildOfClass("Humanoid")
+                        if humanoid then
+                            humanoid:TakeDamage(damage)
+                        end
+                    end)
+
+                    -- Optional: Destroy the bullet after some time
+                    game:GetService("Debris"):AddItem(bullet, 5) -- Destroy the bullet after 5 seconds
+                end
+            end
+        end
+
+        -- Start firing the gun
+        fireGun()
+    print("Clicked")
+end)
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "patrickGui"
+gui.Parent = game.CoreGui
+
+--screengui = gui
+
+
+
+    local TextButton = Instance.new("TextButton")
+-- Text
+TextButton.Text = "Toggle"
+TextButton.TextSize = 24
+-- Color
+TextButton.TextColor3 = Color3.new(1, 1, 1)
+TextButton.BackgroundColor3 = Color3.new(0, 1, 1)
+TextButton.BorderColor3 = Color3.new(1, 1, 1)
+-- thickness
+TextButton.BorderSizePixel = 4
+-- Text Code
+TextButton.Font = Enum.Font.Code
+-- Size
+TextButton.Size = UDim2.new(0.2, 0, 0.1, 0)
+-- Posisition
+TextButton.Position = UDim2.new(0, 0, 0.4, 0)
+-- Function
+TextButton.MouseButton1Click:Connect (function()
+Library:ToggleUI()
+end)
+TextButton.Parent = gui
+TextButton.Draggable = true
+
+    local cornerUI = Instance.new("UICorner")
+cornerUI.CornerRadius = UDim.new(0, 5)
+cornerUI.Parent = TextButton
+
+    local uiStroke = Instance.new("UIStroke")
+    uiStroke.Color = Color3.new(0, 0, 0)
+    uiStroke.Thickness = 2
+    uiStroke.Parent = TextButton
